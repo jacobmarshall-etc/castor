@@ -9,6 +9,7 @@ from docker_events.models import DockerEvent
 class WebHook(models.Model):
     docker_server = models.ForeignKey(DockerServer)
     payload_url = models.CharField(max_length=255)
+    payload_template = models.TextField(null=True)
     active = models.BooleanField(default=True)
 
 
@@ -24,3 +25,6 @@ class Delivery(models.Model):
     status_code = models.IntegerField(default=None, null=True)
     response_headers = JSONField(default={}, null=True)
     response_body = models.TextField(null=True, blank=True)
+
+    class Meta:
+        verbose_name_plural = 'Deliveries'

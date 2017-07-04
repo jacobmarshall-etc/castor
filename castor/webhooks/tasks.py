@@ -1,7 +1,9 @@
+import json
 from datetime import datetime
 
 import requests
 from celery import shared_task
+from django import template
 
 from docker_events.models import DockerEvent
 from webhooks.models import Delivery
@@ -21,6 +23,13 @@ def dispatch_docker_event_to_webhook(docker_event_id, webhook_id):
         'event': docker_event.data,
         'docker_server': docker_event.docker_server.name
     }
+
+    if webhook.payload_template:
+        payload_template_django = template.Template(webhook.payload_template)
+        context = template.Context(data)
+        payload_text = payload_template_django.render(context)
+        data = json.loads(payload_text)
+
     dispatched_at = datetime.now()
 
     try:
